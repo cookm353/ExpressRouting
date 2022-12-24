@@ -1,4 +1,4 @@
-const { Stats } = require('../dist/model')
+const { Stats, RequestHandler } = require('../dist/model')
 
 describe("Test stats methods", () => {
     let stats
@@ -30,5 +30,44 @@ describe("Test stats methods", () => {
     test("Test mode", () => {
         let nums = [1, 2, 2, 3, 4]
         expect(stats.mode(nums)).toEqual(2)
+    })
+})
+
+describe("Test request handler", () => {
+    let handler
+    let nums
+
+    beforeAll(() => {
+        nums = [1, 3, 3, 3, 5]
+        handler = new RequestHandler()
+    })
+
+    test("Test response builder for mean", () => {
+        expect(handler.buildResponse("mean", nums)).toEqual({
+            "operation": "mean",
+            "value": 3
+        })
+    })
+
+    test("Test response builder for median", () => {
+        expect(handler.buildResponse("median", nums)).toEqual({
+            "operation": "median",
+            "value": 3
+        })
+    })
+
+    test("Test response builder for mode", () => {
+        expect(handler.buildResponse("mode", nums)).toEqual({
+            "operation": "mode",
+            "value": 3
+        })
+    })
+
+    test("Test response builder for all", () => {
+        expect(handler.buildResponse("all", nums)).toEqual({
+            "mean": 3,
+            "median": 3,
+            "mode": 3
+        })
     })
 })
