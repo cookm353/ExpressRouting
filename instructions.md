@@ -13,13 +13,13 @@ response: {
 }
 ```
 
-- [ ] The app should also handle the following errors:
-  - [ ] Passing an invalid number (NaN errors)
-    - [ ] Return a 400 status code
-    - [ ] Return a response saying <x> is not a number
-  - [ ] Empty input
-    - [ ] Return a 400 status code
-    - [ ] Return a message saying nums are required
+- [x] The app should also handle the following errors:
+  - [x] Passing an invalid number (NaN errors)
+    - [x] Return a 400 status code
+    - [x] Return a response saying <x> is not a number
+  - [x] Empty input
+    - [x] Return a 400 status code
+    - [x] Return a message saying nums are required
 
 ## Further Study
 
