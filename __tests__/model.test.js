@@ -1,4 +1,4 @@
-const { Stats, RequestHandler } = require('../dist/model')
+const { Stats, RequestHandler, ExpressError } = require('../dist/models')
 
 describe("Test stats methods", () => {
     let stats
@@ -69,5 +69,39 @@ describe("Test request handler", () => {
             "median": 3,
             "mode": 3
         })
+    })
+
+    test("Test validating input with ints", () => {
+        const body = {nums: nums}
+        expect(handler.validateInput(body)).toBeUndefined()
+    })
+
+    test("Test validating input with string number", () => {
+        nums = [1, 2, "3"]
+        const body = {nums: nums}
+        expect(handler.validateInput(body)).toBeUndefined()
+    })
+
+    test("Test validating with string in array", () => {
+        nums = [1, 2, 3, "foo"]
+        const body = {nums: nums}
+        const error = handler.validateInput(body)
+        expect(error).toBeInstanceOf(ExpressError)
+        expect(error.msg).toEqual("Array must contain only numbers")
+    })
+
+    test("Test validating with empty array", () => {
+        nums = []
+        const body = {nums: nums}
+        const error = handler.validateInput(body)
+        expect(error).toBeInstanceOf(ExpressError)
+        expect(error.msg).toEqual("Numbers are required")
+    })
+
+    test("Test validating without any nums", () => {
+        const body = {}
+        const error = handler.validateInput(body)
+        expect(error).toBeInstanceOf(ExpressError)
+        expect(error.msg).toEqual("Numbers are required")
     })
 })
