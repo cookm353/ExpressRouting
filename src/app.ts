@@ -26,19 +26,6 @@ app.get('/mean', (req, resp, next) => {
         return next(err)
     }
     return resp.json(json)
-    // try {
-        // const err = handler.validateInput(req.body)
-    //     if (! req.body.nums) { 
-    //         const err = new ExpressError("Numbers are required", 400) 
-            
-    //         throw new ExpressError("Numbers are required", 400) 
-    //     }
-    //     const { nums } = req.body
-    //     const json = handler.buildResponse("mean", nums)
-        
-    // } catch (err) {
-    //     return next(err)
-    // }
 })
 
 app.get('/median', (req, resp, next) => {
@@ -59,21 +46,38 @@ app.get('/median', (req, resp, next) => {
 })
 
 app.get('/mode', (req, resp, next) => {
-    const { nums } = req.body
-    const json = handler.buildResponse("mode", nums)
+    try {    
+        const { nums } = req.body
+        if (!nums) {
+            throw new ExpressError("Numbers are required", 400)
+        } else if (!handler.validateInput(nums)) {
+            throw new ExpressError("Array must contain only numbers", 400)
+        }
+    } catch (err) {
+        return next(err)
+    }
 
+    const json = handler.buildResponse("mode", nums)
     return resp.json(json)
 })
 
 app.get('/all', (req, resp, next) => {
-    const { nums } = req.body
-    const json = handler.buildResponse("all", nums)
+    try {    
+        const { nums } = req.body
+        if (!nums) {
+            throw new ExpressError("Numbers are required", 400)
+        } else if (!handler.validateInput(nums)) {
+            throw new ExpressError("Array must contain only numbers", 400)
+        }
+    } catch (err) {
+        return next(err)
+    }
 
+    const json = handler.buildResponse("all", nums)
     return resp.json(json)
 })
 
 app.use((req, resp, next) => {
-    // console.log(err.msg)
     const err = new ExpressError("Page Not Found", 404)
     next(err)
 })
@@ -81,9 +85,6 @@ app.use((req, resp, next) => {
 app.use((err, req, resp, next) => {
     const status = err.status || 500
     const msg = err.msg
-    // debugger
-
-    console.log(status, msg)
 
     return resp.status(status).json({
         error: { msg, status }
