@@ -1,5 +1,7 @@
-const { Stats } = require('./model')
+const { Stats, RequestHandler, ExpressError } = require('./models')
 const express = require('express')
+const fs = require('fs')
+const process = require('process')
 
 const app = express()
 const port: number = 3000
@@ -8,54 +10,84 @@ const stats = new Stats
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-interface StatsResp {
-    "operation": string,
-    "value": number
-}
+const handler = new RequestHandler
 
-// Index
-app.get('/', (req, resp) => {
-    return resp.send('<h1>Hi!</h1>')
+app.get('/mean', (req, resp, next) => {
+    let json
+    try {
+        const err = handler.validateInput(req.body.nums)
+        if (err) {
+            throw err
+        } else {
+            const { nums } = req.body
+            json = handler.buildResponse("mean", nums)
+        }
+    } catch (err) {
+        return next(err)
+    }
+    return resp.json(json)
+    // try {
+        // const err = handler.validateInput(req.body)
+    //     if (! req.body.nums) { 
+    //         const err = new ExpressError("Numbers are required", 400) 
+            
+    //         throw new ExpressError("Numbers are required", 400) 
+    //     }
+    //     const { nums } = req.body
+    //     const json = handler.buildResponse("mean", nums)
+        
+    // } catch (err) {
+    //     return next(err)
+    // }
 })
 
-app.get('/mean', (req, resp) => {
-    const { nums } = req.body
-    console.log(stats.mean(nums))
-    const json: StatsResp = {
-        "operation": "mean",
-        "value": stats.mean(nums)
-    }
+app.get('/median', (req, resp, next) => {
     
+    try {    
+        const { nums } = req.body
+        if (!nums) {
+            throw new ExpressError("Numbers are required", 400)
+        } else if (!handler.validateInput(nums)) {
+            throw new ExpressError("Array must contain only numbers", 400)
+        }
+    } catch (err) {
+        return next(err)
+    }
+
+    const json = handler.buildResponse("median", nums)
     return resp.json(json)
 })
 
-app.get('/median', (req, resp) => {
+app.get('/mode', (req, resp, next) => {
     const { nums } = req.body
-    const json: StatsResp = {
-        "operation": "median",
-        "value": stats.median(nums)
-    }
-    
+    const json = handler.buildResponse("mode", nums)
+
     return resp.json(json)
 })
 
-app.get('/mode', (req, resp) => {
+app.get('/all', (req, resp, next) => {
     const { nums } = req.body
-    const json: StatsResp = {
-        "operation": "mode",
-        "value": stats.mode(nums)
-    }
+    const json = handler.buildResponse("all", nums)
+
     return resp.json(json)
 })
 
-app.get('/all', (req, resp) => {
-    const { nums } = req.body
-    const json = {
-        "mean": stats.mean(nums),
-        "median": stats.median(nums),
-        "mode": stats.mode(nums)
-    }
-    return resp.json(json)
+app.use((req, resp, next) => {
+    // console.log(err.msg)
+    const err = new ExpressError("Page Not Found", 404)
+    next(err)
+})
+
+app.use((err, req, resp, next) => {
+    const status = err.status || 500
+    const msg = err.msg
+    // debugger
+
+    console.log(status, msg)
+
+    return resp.status(status).json({
+        error: { msg, status }
+    })
 })
 
 app.listen(port, () => {

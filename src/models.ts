@@ -57,15 +57,11 @@ interface AllResp {
     "mode": number
 }
 
-class RequestHandler {
-    constructor() {
-    }
-    
+class RequestHandler {   
     // Create response object
     buildResponse(operation: string, nums: Array<number>): StatsResp | AllResp {
         let resp: StatsResp | AllResp
         const stats = new Stats()
-
 
         switch (operation) {
             case "mean":
@@ -108,8 +104,15 @@ class RequestHandler {
     }
 
     // Verify input
-    validateInput(): boolean {
-        return true
+    validateInput(nums: Array<number | string>): object | void {
+        if (nums.length == 0 || ! nums) {
+            return new ExpressError("Numbers are required", 400)
+        } else {
+            const isAllNumbers = nums.every(element => {
+                return ! Number.isNaN(parseInt(element))
+            })
+            if (! isAllNumbers) return new ExpressError("Array must contain only numbers", 400)
+        }
     }
 }
 

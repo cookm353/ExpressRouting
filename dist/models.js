@@ -40,8 +40,6 @@ class Stats {
     }
 }
 class RequestHandler {
-    constructor() {
-    }
     // Create response object
     buildResponse(operation, nums) {
         let resp;
@@ -85,8 +83,17 @@ class RequestHandler {
         });
     }
     // Verify input
-    validateInput() {
-        return true;
+    validateInput(nums) {
+        if (nums.length == 0 || !nums) {
+            return new ExpressError("Numbers are required", 400);
+        }
+        else {
+            const isAllNumbers = nums.every(element => {
+                return !Number.isNaN(parseInt(element));
+            });
+            if (!isAllNumbers)
+                return new ExpressError("Array must contain only numbers", 400);
+        }
     }
 }
 class ExpressError extends Error {
