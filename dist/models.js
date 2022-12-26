@@ -83,12 +83,12 @@ class RequestHandler {
         });
     }
     // Verify input
-    validateInput(nums) {
-        if (nums.length == 0 || !nums) {
+    validateInput(body) {
+        if (!body.nums || body.nums.length == 0) {
             return new ExpressError("Numbers are required", 400);
         }
         else {
-            const isAllNumbers = nums.every(element => {
+            const isAllNumbers = body.nums.every(element => {
                 return !Number.isNaN(parseInt(element));
             });
             if (!isAllNumbers)

@@ -11,7 +11,7 @@ const handler = new RequestHandler;
 app.get('/mean', (req, resp, next) => {
     let json;
     try {
-        const err = handler.validateInput(req.body.nums);
+        const err = handler.validateInput(req.body);
         if (err) {
             throw err;
         }
